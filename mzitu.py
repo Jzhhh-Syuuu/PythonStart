@@ -54,26 +54,27 @@ def rename(name):
 
 
 def save_one_atlas(old_url):
-    page, name = get_page_name(old_url)
-    new_name = rename(name)
-    if not os.path.exists(new_name):
-        os.mkdir(new_name)
+    try:
+        page, name = get_page_name(old_url)
+        new_name = rename(name)
+        if not os.path.exists(new_name):
+            os.mkdir(new_name)
 
-    print("图集--" + name + "--开始保存")
-    for i in range(1, int(page)+1):
-        try:
+        print("图集--" + name + "--开始保存")
+        for i in range(1, int(page)+1):
+
             url = old_url + "/" + str(i)
             img_url = get_img_url(url, name)
             # print(img_url)
             save_img(img_url, i, name)
             print('正在保存第' + str(i) + '张图片')
-        except TimeoutError:
-            print("超时")
-        except:
-            print("异常")
-        pass
-    print("图集--" + name + "保存成功")
 
+        print("图集--" + name + "保存成功")
+    except TimeoutError:
+            print("超时")
+    except:
+            print("异常")
+    pass
 
 def get_atlas_list(url):
     req = requests.get(url, headers=Hostreferer)
@@ -94,6 +95,8 @@ def save_one_page(start_url):
 if __name__ == '__main__':
     print("爬取开始")
     start_url = "https://www.mzitu.com/"
+    os.chdir(r'D:\JZH\新建文件夹')
+    retval = os.getcwd()
     for count in range(1, 3):
         url = start_url + "page/" + str(count) + "/"
         save_one_page(url)
