@@ -10,24 +10,23 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 Hostreferer = {
-    # 'User-Agent': str(UserAgent().random),
-    'User-Agent': 'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
-    'Referer': 'https://www.mzitu.com'
+    'User-Agent': str(UserAgent().random),
+    # 'User-Agent': 'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
+    'Referer': 'http://acg17.com'
 }
 
 Picreferer = {
-    # 'User-Agent': str(UserAgent().random),
-    'User-Agent': 'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
-    'Referer': 'http://i.meizitu.net'
+    'User-Agent': str(UserAgent().random),
+    # 'User-Agent': 'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
+    'Referer': 'http://acg17.com'
 }
 
 
 def get_page_name(url):  # 获得图集最大页数和名称
     html = get_html(url)
     soup = BeautifulSoup(html, 'lxml')
-    span = soup.findAll('span')
-    title = soup.find('h2', class_="main-title")
-    return span[9].text, title.text
+    title = soup.find('span', itemprop="name")
+    return title.text
 
 
 def get_html(url):  # 获得页面html代码
@@ -39,8 +38,10 @@ def get_html(url):  # 获得页面html代码
 def get_img_url(url, name):
     html = get_html(url)
     soup = BeautifulSoup(html, 'lxml')
-    img_url = soup.find('img', alt=name)
-    return img_url['src']
+    # img_url = soup.find_all('img', alt=name+'- ACG17.COM')
+    img_url = soup.find_all('img', attrs={
+                            'alt': name+'- ACG17.COM', 'referrerpolicy': not('no-referrer'), 'class': not('wxpic')})
+    return img_url
 
 
 def save_img(img_url, count, name):
@@ -58,19 +59,25 @@ def rename(name):
 
 def save_one_atlas(old_url):
     try:
-        page, name = get_page_name(old_url)
+        name = get_page_name(old_url)
         new_name = rename(name)
         if not os.path.exists(new_name):
             os.mkdir(new_name)
+        else:
+            print("图集--" + name + "--已存在")
+            pass
 
         print("图集--" + name + "--开始保存")
-        for i in range(1, int(page)+1):
 
-            url = old_url + "/" + str(i)
-            img_url = get_img_url(url, name)
+        i = 1
+
+        url = old_url
+        img_urls = get_img_url(url, name)
+        for img_url in img_urls:
             # print(img_url)
-            save_img(img_url, i, name)
+            save_img(img_url['src'], i, name)
             print('正在保存第' + str(i) + '张图片')
+            i = i+1
             time.sleep(0.2)
 
         print("图集--" + name + "保存成功")
@@ -85,10 +92,10 @@ def save_one_atlas(old_url):
 def get_atlas_list(url):
     req = requests.get(url, headers=Hostreferer, timeout=(3, 7))
     soup = BeautifulSoup(req.text, 'lxml')
-    atlas = soup.find_all(attrs={'class': 'lazy'})
+    atlas = soup.find_all(attrs={'class': 'more-link'})
     atlas_list = []
     for atla in atlas:
-        atlas_list.append(atla.parent['href'])
+        atlas_list.append(atla['href'])
     return atlas_list
 
 
@@ -100,7 +107,7 @@ def save_one_page(start_url):
 
 if __name__ == '__main__':
     print("爬取开始")
-    start_url = "https://www.mzitu.com/"
+    start_url = "http://acg17.com/tag/pixiv/"
     # 创建并修改至下载路径
     firstpath = r'D:'
     secondpath = r'D:\PythonDownload'
