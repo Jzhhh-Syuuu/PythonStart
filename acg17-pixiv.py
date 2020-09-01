@@ -65,7 +65,7 @@ def save_one_atlas(old_url):
             os.mkdir(new_name)
         else:
             print("图集--" + name + "--已存在")
-            pass
+            return
 
         print("图集--" + name + "--开始保存")
 

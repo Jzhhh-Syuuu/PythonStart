@@ -18,7 +18,8 @@ Hostreferer = {
 Picreferer = {
     # 'User-Agent': str(UserAgent().random),
     'User-Agent': 'Mozilla/5.0 (X11; OpenBSD i386) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36',
-    'Referer': 'http://i.meizitu.net'
+    'Referer': 'https://www.mzitu.com'
+    # 'Referer': 'http://i.meizitu.net'
 }
 
 
@@ -62,6 +63,9 @@ def save_one_atlas(old_url):
         new_name = rename(name)
         if not os.path.exists(new_name):
             os.mkdir(new_name)
+        else:
+            print("图集--" + name + "--已存在")
+            return
 
         print("图集--" + name + "--开始保存")
         for i in range(1, int(page)+1):
@@ -104,7 +108,7 @@ if __name__ == '__main__':
     # 创建并修改至下载路径
     firstpath = r'D:'
     secondpath = r'D:\PythonDownload'
-    thirdpath = r'D:\PythonDownload\acg17-pixiv'
+    thirdpath = r'D:\PythonDownload\mzitu'
     os.chdir(firstpath)
     if not os.path.exists(secondpath):
         os.mkdir(secondpath)
