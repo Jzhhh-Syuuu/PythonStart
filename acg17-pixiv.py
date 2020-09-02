@@ -120,8 +120,9 @@ if __name__ == '__main__':
     os.chdir(thirdpath)
     retval = os.getcwd()
 
-    for count in range(1, 10):
+    for count in range(1, 200):
         url = start_url + "page/" + str(count) + "/"
         save_one_page(url)
     print("爬取完成")
     input()
+    os.system("pause")
