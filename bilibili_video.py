@@ -5,6 +5,7 @@ import re
 import json
 from lxml import etree
 from urllib import parse
+from ffmpy3 import FFmpeg
 
 
 class bilibili():
@@ -157,6 +158,10 @@ class bilibili():
                             print('\r' + '[下载进度]:%s%.2f%%' % ('>' * int(count * 50 / length), float(
                                 count / length * 100)), end=' ' + ' Speed:%.2f ' % speed + 'M/S')
                             time1 = time.time()
+                count += len(chunk)
+                speed = (count - count_tmp) / 1024 / 1024 / 2
+                print('\r' + '[下载进度]:%s%.2f%%' % ('>' * int(count * 50 / length), float(
+                    count / length * 100)), end=' ' + ' Speed:%.2f ' % speed + 'M/S')
                 end_time = time.time()  # 下载结束时间
                 print('\nDownload completed!,times: %.2f秒\n' %
                       (end_time - start_time))  # 输出下载用时时间
@@ -202,6 +207,10 @@ class bilibili():
                             print('\r' + '[下载进度]:%s%.2f%%' % ('>' * int(count * 50 / length), float(
                                 count / length * 100)), end=' ' + ' Speed:%.2f ' % speed + 'M/S')
                             time1 = time.time()
+                count += len(chunk)
+                speed = (count - count_tmp) / 1024 / 1024 / 2
+                print('\r' + '[下载进度]:%s%.2f%%' % ('>' * int(count * 50 / length), float(
+                    count / length * 100)), end=' ' + ' Speed:%.2f ' % speed + 'M/S')
                 end_time = time.time()  # 下载结束时间
                 print('\nDownload completed!,times: %.2f秒\n' %
                       (end_time - start_time))  # 输出下载用时时间
@@ -234,9 +243,27 @@ class bilibili():
                 f.write(cmd+'\n')
                 f.write("\n")
             f.close()
+            '''自动合并音视频'''
+            try:
+                print(f"--------{name}  音视频开始合并--------")
+                ff = FFmpeg(
+                    inputs={
+                        video_filepath: None,
+                        audio_filepath: None,
+                    },
+                    outputs={
+                        out_filepath: '-c:v h264 -c:a ac3'
+                    }
+                )
+                ff.run()
+                print(f"--------{name}  音视频合并完毕--------")
+            except Exception as err:
+                print("合并异常:"+str(err))
+                continue
         with open(log_filepath, 'a+') as f:
             f.write("\n")
-            f.write("------电脑安装好FFmpeg配置好path环境变量后，复制以下命令到cmd命令窗口可以实现将音视频合并。\n")
+            f.write("------理论上会自动合并音视频，如有特殊情况合并失败可尝试以下手动方法。\n")
+            f.write("------电脑安装好FFmpeg配置好path环境变量后，复制以上命令到cmd命令窗口可以实现将音视频合并。\n")
             f.write("------安装FFmpeg及配置path环境变量教程自行百度即可\n")
         f.close()
         print("--------log写入完毕--------")
@@ -255,19 +282,17 @@ class bilibili():
     '''运行方法'''
 
     def run(self, url):
-        self.download_video(self.parseHtml(
-            self.getHtml(self.getRight_urls(fanhao))))
-        self.download_audio(self.parseHtml(
-            self.getHtml(self.getRight_urls(fanhao))))
-        self.CombineVideoAudio(self.parseHtml(
-            self.getHtml(self.getRight_urls(fanhao))))
+        self.video_list = self.parseHtml(
+            self.getHtml(self.getRight_urls(fanhao)))
+        self.download_video(self.video_list)
+        self.download_audio(self.video_list)
+        self.CombineVideoAudio(self.video_list)
         # self.parseHtml(self.getHtml(url))
         # self.getHtml(self.getRight_urls(fanhao))
         # self.getRight_urls(url)
 
 
 if __name__ == '__main__':
-    start_url = "http://acg17.com/tag/pixiv/"
     # 创建并修改至下载路径
     firstpath = r'D:'
     secondpath = r'D:\PythonDownload'
@@ -280,7 +305,8 @@ if __name__ == '__main__':
     os.chdir(thirdpath)
     retval = os.getcwd()
 
-    fanhao = input("输入B站番号")
+    # BV1vK4y1Y7su
+    fanhao = input("输入B站BV番号")
     print("爬取开始")
     bilibili().run(fanhao)
     print("爬取完成")
