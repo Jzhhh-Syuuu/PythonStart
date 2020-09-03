@@ -20,7 +20,7 @@ class bilibili():
         # 设置请求视频资源时的头部信息
         self.downloadVideoHeaders = {
             'Origin': 'https://www.bilibili.com',
-            'Referer': 'https://www.bilibili.com/video/av26522634',
+            'Referer': 'https://www.bilibili.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
         }
         self.domain = "https://www.bilibili.com/video/"
@@ -307,8 +307,9 @@ if __name__ == '__main__':
 
     # BV1vK4y1Y7su
     fanhao = input("输入B站BV番号")
-    print("爬取开始")
+    print("--------爬取开始--------")
     bilibili().run(fanhao)
-    print("爬取完成")
+    print("--------爬取完成--------")
+    print(r"--------下载路径为'D:\PythonDownload\bilibili'--------")
     input()
     os.system("pause")

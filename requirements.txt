@@ -6,3 +6,4 @@ fake-useragent
 pyquery
 Selenium
 ffmpy3
+aiohttp
