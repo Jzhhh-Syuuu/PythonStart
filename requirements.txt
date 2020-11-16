@@ -7,3 +7,4 @@ pyquery
 Selenium
 ffmpy3
 aiohttp
+pycryptodome 
